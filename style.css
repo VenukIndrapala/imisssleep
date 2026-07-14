@@ -996,3 +996,16 @@ body {
   background-color: var(--dark-color);
   z-index: 1;
 }
+/* ... [All your existing CSS code remains here exactly as you provided it] ... */
+
+/* --- NEW CODE ADDED BELOW --- */
+
+#text-canvas {
+  position: fixed;
+  top: 10%; /* Positions the text in the upper sky area */
+  left: 0;
+  width: 100%;
+  height: 40vh;
+  pointer-events: none; /* Allows clicks to pass through to flowers/fireworks */
+  z-index: 5; /* Ensures it sits above the flowers */
+}
