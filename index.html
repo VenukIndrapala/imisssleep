@@ -11,9 +11,7 @@
   Inspired by https://dribbble.com/shots/11096994-Virtual-Garden.
 -->
 <body class="not-loaded">
-  <video class="bg-fireworks" autoplay muted loop playsinline webkit-playsinline preload="auto">
-    <source src="fireworks-bg.mp4" type="video/mp4">
-  </video>
+  <canvas id="fireworks-canvas" class="bg-fireworks"></canvas>
   <div class="night"></div>
   <div class="flowers">
     <div class="flower flower--1">
@@ -312,6 +310,7 @@
     </div>
   </div>
 
+  <script src="fireworks.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
