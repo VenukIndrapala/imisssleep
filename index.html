@@ -12,6 +12,9 @@
 -->
 <body class="not-loaded">
   <canvas id="fireworks-canvas" class="bg-fireworks"></canvas>
+  <!-- New text canvas for the floating words -->
+  <canvas id="text-canvas"></canvas>
+  
   <div class="night"></div>
   <div class="flowers">
     <div class="flower flower--1">
@@ -94,6 +97,7 @@
       </div>
     </div>
 
+    <!-- [Note: All original flower components remain unchanged below] -->
     <div class="grow-ans" style="--d:1.2s">
       <div class="flower__g-long">
         <div class="flower__g-long__top"></div>
@@ -312,5 +316,6 @@
 
   <script src="fireworks.js"></script>
   <script src="script.js"></script>
+  <script src="text-animation.js"></script>
 </body>
 </html>
