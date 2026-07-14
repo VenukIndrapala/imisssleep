@@ -24,7 +24,8 @@ class Particle {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.size = Math.random() * 1.8 + 0.8; // Slightly larger for clarity
+    // Particles remain small for crispness
+    this.size = 1.2; 
     this.color = Math.random() > 0.5 ? '#ffd700' : '#f2a6c2';
   }
   draw() {
@@ -39,19 +40,24 @@ class Particle {
 function initText(text) {
   particles = [];
   ctx.fillStyle = "white";
-  // Reduced font size to prevent wrapping/overflow
-  ctx.font = "bold 6vw Arial"; 
+  
+  // Mobile-friendly responsive font sizing
+  const fontSize = window.innerWidth < 600 ? "4.5vh" : "5vw";
+  ctx.font = `bold ${fontSize} Arial`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
+  
   ctx.clearRect(0, 0, w, h);
   ctx.fillText(text, w / 2, h / 2);
   
   const data = ctx.getImageData(0, 0, w, h).data;
   ctx.clearRect(0, 0, w, h);
   
-  // INCREASED sampling gap from 4 to 8 to stop jumbling
-  for (let y = 0; y < h; y += 8) {
-    for (let x = 0; x < w; x += 8) {
+  // Increased sampling gap (10) for mobile to prevent clustering
+  const gap = window.innerWidth < 600 ? 10 : 8;
+  
+  for (let y = 0; y < h; y += gap) {
+    for (let x = 0; x < w; x += gap) {
       if (data[(y * w + x) * 4 + 3] > 128) {
         particles.push(new Particle(x, y));
       }
@@ -65,7 +71,7 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
-// Logic: Delay 5 seconds, then cycle phrases
+// Start sequence after 5 seconds
 setTimeout(() => {
   function nextPhrase() {
     if (currentPhrase < phrases.length) {
