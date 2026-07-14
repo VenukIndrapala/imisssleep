@@ -24,8 +24,8 @@ class Particle {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    // Particles remain small for crispness
-    this.size = 1.2; 
+    // Increased size slightly to ensure visibility on mobile screens
+    this.size = window.innerWidth < 600 ? 1.8 : 1.2; 
     this.color = Math.random() > 0.5 ? '#ffd700' : '#f2a6c2';
   }
   draw() {
@@ -41,8 +41,8 @@ function initText(text) {
   particles = [];
   ctx.fillStyle = "white";
   
-  // Mobile-friendly responsive font sizing
-  const fontSize = window.innerWidth < 600 ? "4.5vh" : "5vw";
+  // Adjusted mobile font size to be much larger relative to the container
+  const fontSize = window.innerWidth < 600 ? "10vw" : "5vw";
   ctx.font = `bold ${fontSize} Arial`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -53,8 +53,8 @@ function initText(text) {
   const data = ctx.getImageData(0, 0, w, h).data;
   ctx.clearRect(0, 0, w, h);
   
-  // Increased sampling gap (10) for mobile to prevent clustering
-  const gap = window.innerWidth < 600 ? 10 : 8;
+  // Smaller gap on mobile for better resolution, larger on desktop to prevent clustering
+  const gap = window.innerWidth < 600 ? 5 : 8;
   
   for (let y = 0; y < h; y += gap) {
     for (let x = 0; x < w; x += gap) {
