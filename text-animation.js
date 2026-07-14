@@ -2,13 +2,6 @@ const canvas = document.getElementById("text-canvas");
 const ctx = canvas.getContext("2d");
 let w, h;
 
-function resize() {
-  w = canvas.width = window.innerWidth;
-  h = canvas.height = window.innerHeight * 0.4;
-}
-window.addEventListener("resize", resize);
-resize();
-
 const phrases = [
   "Oh hey there",
   "Looks like you pulled through",
@@ -17,43 +10,69 @@ const phrases = [
   "Keep it up Queen"
 ];
 
-let currentPhraseIndex = 0;
-let opacity = 0;
-let fadeIn = true;
+let particles = [];
+let currentPhrase = 0;
 
-function drawText(text) {
-  ctx.clearRect(0, 0, w, h);
-  ctx.font = "bold 5vw Arial";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  
-  // Shimmering effect via alpha oscillation
-  const shimmer = 0.7 + Math.sin(Date.now() * 0.005) * 0.3;
-  ctx.globalAlpha = shimmer;
-  
-  // Gold and Pink mix
-  let gradient = ctx.createLinearGradient(0, 0, w, 0);
-  gradient.addColorStop(0, "#ffd700");
-  gradient.addColorStop(1, "#f2a6c2");
-  
-  ctx.fillStyle = gradient;
-  ctx.fillText(text, w / 2, h / 2);
+function resize() {
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight * 0.4;
 }
+window.addEventListener("resize", resize);
+resize();
 
-function animate() {
-  drawText(phrases[currentPhraseIndex]);
-  requestAnimationFrame(animate);
-}
-
-// Logic to loop through phrases once then stop
-function startSequence() {
-  if (currentPhraseIndex < phrases.length - 1) {
-    setTimeout(() => {
-      currentPhraseIndex++;
-      startSequence();
-    }, 4000); // 4 seconds per phrase
+class Particle {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.size = Math.random() * 1.5 + 0.5;
+    this.baseX = x;
+    this.baseY = y;
+    this.density = Math.random() * 30 + 1;
+    this.color = Math.random() > 0.5 ? '#ffd700' : '#f2a6c2';
+  }
+  draw() {
+    ctx.fillStyle = this.color;
+    ctx.globalAlpha = Math.random() * 0.5 + 0.5; // The "sparkle"
+    ctx.beginPath();
+    ctx.arc(this.x + (Math.random()-0.5), this.y + (Math.random()-0.5), this.size, 0, Math.PI * 2);
+    ctx.fill();
   }
 }
 
-animate();
-startSequence();
+function initText(text) {
+  particles = [];
+  ctx.fillStyle = "white";
+  ctx.font = "bold 8vw Arial";
+  ctx.textAlign = "center";
+  ctx.fillText(text, w / 2, h / 2);
+  
+  const data = ctx.getImageData(0, 0, w, h).data;
+  ctx.clearRect(0, 0, w, h);
+  
+  for (let y = 0; y < h; y += 4) {
+    for (let x = 0; x < w; x += 4) {
+      if (data[(y * w + x) * 4 + 3] > 128) {
+        particles.push(new Particle(x, y));
+      }
+    }
+  }
+}
+
+function animate() {
+  ctx.clearRect(0, 0, w, h);
+  particles.forEach(p => p.draw());
+  requestAnimationFrame(animate);
+}
+
+// Logic: Delay 5 seconds (2 fireworks), then cycle phrases
+setTimeout(() => {
+  function nextPhrase() {
+    if (currentPhrase < phrases.length) {
+      initText(phrases[currentPhrase]);
+      setTimeout(nextPhrase, 4000);
+      currentPhrase++;
+    }
+  }
+  nextPhrase();
+  animate();
+}, 5000);
