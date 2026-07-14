@@ -24,17 +24,14 @@ class Particle {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.size = Math.random() * 1.5 + 0.5;
-    this.baseX = x;
-    this.baseY = y;
-    this.density = Math.random() * 30 + 1;
+    this.size = Math.random() * 1.8 + 0.8; // Slightly larger for clarity
     this.color = Math.random() > 0.5 ? '#ffd700' : '#f2a6c2';
   }
   draw() {
     ctx.fillStyle = this.color;
-    ctx.globalAlpha = Math.random() * 0.5 + 0.5; // The "sparkle"
+    ctx.globalAlpha = Math.random() * 0.5 + 0.5;
     ctx.beginPath();
-    ctx.arc(this.x + (Math.random()-0.5), this.y + (Math.random()-0.5), this.size, 0, Math.PI * 2);
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
     ctx.fill();
   }
 }
@@ -42,15 +39,19 @@ class Particle {
 function initText(text) {
   particles = [];
   ctx.fillStyle = "white";
-  ctx.font = "bold 8vw Arial";
+  // Reduced font size to prevent wrapping/overflow
+  ctx.font = "bold 6vw Arial"; 
   ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.clearRect(0, 0, w, h);
   ctx.fillText(text, w / 2, h / 2);
   
   const data = ctx.getImageData(0, 0, w, h).data;
   ctx.clearRect(0, 0, w, h);
   
-  for (let y = 0; y < h; y += 4) {
-    for (let x = 0; x < w; x += 4) {
+  // INCREASED sampling gap from 4 to 8 to stop jumbling
+  for (let y = 0; y < h; y += 8) {
+    for (let x = 0; x < w; x += 8) {
       if (data[(y * w + x) * 4 + 3] > 128) {
         particles.push(new Particle(x, y));
       }
@@ -64,7 +65,7 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
-// Logic: Delay 5 seconds (2 fireworks), then cycle phrases
+// Logic: Delay 5 seconds, then cycle phrases
 setTimeout(() => {
   function nextPhrase() {
     if (currentPhrase < phrases.length) {
