@@ -1,6 +1,5 @@
 const canvas = document.getElementById("text-canvas");
 const ctx = canvas.getContext("2d");
-let w, h;
 
 const phrases = [
   "Oh hey there",
@@ -13,19 +12,21 @@ const phrases = [
 let particles = [];
 let currentPhrase = 0;
 
-function resize() {
-  w = canvas.width = window.innerWidth;
-  h = canvas.height = window.innerHeight * 0.4;
+// Set a fixed logical resolution for the canvas
+function setupCanvas() {
+  canvas.width = 800; 
+  canvas.height = 300;
+  // CSS handles the display size, but internal coordinate system is fixed
+  canvas.style.width = "100%";
+  canvas.style.height = "auto";
 }
-window.addEventListener("resize", resize);
-resize();
+setupCanvas();
 
 class Particle {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    // Increased size slightly to ensure visibility on mobile screens
-    this.size = window.innerWidth < 600 ? 1.8 : 1.2; 
+    this.size = 2.5; // Larger base size for better visibility
     this.color = Math.random() > 0.5 ? '#ffd700' : '#f2a6c2';
   }
   draw() {
@@ -40,25 +41,22 @@ class Particle {
 function initText(text) {
   particles = [];
   ctx.fillStyle = "white";
-  
-  // Adjusted mobile font size to be much larger relative to the container
-  const fontSize = window.innerWidth < 600 ? "10vw" : "5vw";
-  ctx.font = `bold ${fontSize} Arial`;
+  ctx.font = "bold 60px Arial"; // Fixed pixel size
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillText(text, w / 2, h / 2);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillText(text, canvas.width / 2, canvas.height / 2);
   
-  const data = ctx.getImageData(0, 0, w, h).data;
-  ctx.clearRect(0, 0, w, h);
+  const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   
-  // Smaller gap on mobile for better resolution, larger on desktop to prevent clustering
-  const gap = window.innerWidth < 600 ? 5 : 8;
+  // Use a smaller gap for better text definition
+  const gap = 6; 
   
-  for (let y = 0; y < h; y += gap) {
-    for (let x = 0; x < w; x += gap) {
-      if (data[(y * w + x) * 4 + 3] > 128) {
+  for (let y = 0; y < canvas.height; y += gap) {
+    for (let x = 0; x < canvas.width; x += gap) {
+      if (data[(y * canvas.width + x) * 4 + 3] > 128) {
         particles.push(new Particle(x, y));
       }
     }
@@ -66,7 +64,7 @@ function initText(text) {
 }
 
 function animate() {
-  ctx.clearRect(0, 0, w, h);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   particles.forEach(p => p.draw());
   requestAnimationFrame(animate);
 }
