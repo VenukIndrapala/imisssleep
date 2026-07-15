@@ -78,11 +78,16 @@
 
   const rockets = [];
   const particles = [];
+  let firstExplosionFired = false;
 
   function explode(x, y, color) {
     const count = 60;
     for (let i = 0; i < count; i++) {
       particles.push(new Particle(x, y, color));
+    }
+    if (!firstExplosionFired) {
+      firstExplosionFired = true;
+      window.dispatchEvent(new CustomEvent("firstFireworkExploded"));
     }
   }
 
