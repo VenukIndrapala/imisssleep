@@ -184,13 +184,30 @@
     requestAnimationFrame(loop);
   }
 
+  let started = false;
+
+  function begin() {
+    if (started) return;
+    started = true;
+    showPhrase(0);
+    setTimeout(advance, TRANSITION_MS + HOLD_MS);
+  }
+
+  function delayedBegin() {
+    setTimeout(begin, 2000);
+  }
+
   resize();
   window.addEventListener("resize", () => {
     resize();
-    showPhrase(phraseIndex);
+    if (started) {
+      showPhrase(phraseIndex);
+    }
   });
 
-  showPhrase(0);
-  setTimeout(advance, TRANSITION_MS + HOLD_MS);
+  window.addEventListener("firstFireworkExploded", delayedBegin, { once: true });
+  // Fallback in case the fireworks script hasn't fired an explosion yet (e.g. slow load)
+  setTimeout(delayedBegin, 4000);
+
   loop();
 })();
