@@ -40,7 +40,7 @@ body {
 
 @media (max-width: 600px) {
   .flowers {
-    transform: scale(0.72) translateX(-8vmin);
+    transform: scale(0.72) translateX(-20vmin);
   }
 }
 
