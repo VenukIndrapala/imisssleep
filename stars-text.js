@@ -23,14 +23,10 @@
     "Keep it up Queen",
   ];
 
-  const colors = ["#f2a6c2", "#e8b93a", "#f7d9a0", "#e8698f"];
+  const STAR_COLOR = "#f4f1e6";
 
   function randRange(min, max) {
     return min + Math.random() * (max - min);
-  }
-
-  function randColor() {
-    return colors[Math.floor(Math.random() * colors.length)];
   }
 
   function samplePoints(text) {
@@ -45,11 +41,11 @@
     let fontSize = h * 0.06;
     const minFont = 16;
     const maxWidth = w * 0.88;
-    octx.font = `700 ${fontSize}px Georgia, serif`;
+    octx.font = `500 ${fontSize}px Georgia, serif`;
 
     while (octx.measureText(text).width > maxWidth && fontSize > minFont) {
       fontSize -= 2;
-      octx.font = `700 ${fontSize}px Georgia, serif`;
+      octx.font = `500 ${fontSize}px Georgia, serif`;
     }
 
     let lines = [text];
@@ -93,7 +89,7 @@
     this.x = randRange(0, w);
     this.y = randRange(0, h * 0.32);
     this.target = target;
-    this.color = randColor();
+    this.color = STAR_COLOR;
     this.size = randRange(1.3, 2.6);
     this.speed = randRange(0.045, 0.09);
     this.twinklePhase = Math.random() * Math.PI * 2;
@@ -113,7 +109,7 @@
     const flicker = 0.55 + Math.sin(this.twinklePhase) * 0.45;
     ctx.globalAlpha = Math.max(flicker, 0.2);
     ctx.shadowColor = this.color;
-    ctx.shadowBlur = 4;
+    ctx.shadowBlur = 3;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
     ctx.fillStyle = this.color;
