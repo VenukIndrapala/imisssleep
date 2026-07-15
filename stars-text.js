@@ -5,8 +5,14 @@
   let h = 0;
 
   function resize() {
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
+    const dpr = window.devicePixelRatio || 1;
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
   const phrases = [
@@ -33,26 +39,46 @@
     off.height = h;
     const octx = off.getContext("2d");
 
-    let fontSize = h * 0.055;
     octx.textAlign = "center";
     octx.textBaseline = "middle";
+
+    let fontSize = h * 0.06;
+    const minFont = 16;
+    const maxWidth = w * 0.88;
     octx.font = `700 ${fontSize}px Georgia, serif`;
 
-    while (octx.measureText(text).width > w * 0.85 && fontSize > 10) {
+    while (octx.measureText(text).width > maxWidth && fontSize > minFont) {
       fontSize -= 2;
       octx.font = `700 ${fontSize}px Georgia, serif`;
     }
 
+    let lines = [text];
+    if (octx.measureText(text).width > maxWidth) {
+      const mid = Math.floor(text.length / 2);
+      let splitIdx = text.lastIndexOf(" ", mid);
+      if (splitIdx === -1) splitIdx = text.indexOf(" ", mid);
+      if (splitIdx !== -1) {
+        lines = [text.slice(0, splitIdx), text.slice(splitIdx + 1)];
+      }
+    }
+
     const cx = w / 2;
-    const cy = h * 0.16;
+    const baseCy = h * 0.16;
     octx.fillStyle = "#fff";
-    octx.fillText(text, cx, cy);
+
+    if (lines.length === 1) {
+      octx.fillText(lines[0], cx, baseCy);
+    } else {
+      octx.fillText(lines[0], cx, baseCy - fontSize * 0.62);
+      octx.fillText(lines[1], cx, baseCy + fontSize * 0.62);
+    }
 
     const imageData = octx.getImageData(0, 0, w, h).data;
     const points = [];
-    const gap = Math.max(3, Math.floor(fontSize / 11));
+    const gap = Math.max(2, Math.floor(fontSize / 14));
+    const scanHeight = lines.length === 1 ? h * 0.3 : h * 0.42;
 
-    for (let y = 0; y < h * 0.32; y += gap) {
+    for (let y = 0; y < scanHeight; y += gap) {
       for (let x = 0; x < w; x += gap) {
         const idx = (y * w + x) * 4 + 3;
         if (imageData[idx] > 128) {
@@ -68,7 +94,7 @@
     this.y = randRange(0, h * 0.32);
     this.target = target;
     this.color = randColor();
-    this.size = randRange(1, 2.3);
+    this.size = randRange(1.3, 2.6);
     this.speed = randRange(0.045, 0.09);
     this.twinklePhase = Math.random() * Math.PI * 2;
   }
@@ -86,10 +112,13 @@
   Particle.prototype.draw = function () {
     const flicker = 0.55 + Math.sin(this.twinklePhase) * 0.45;
     ctx.globalAlpha = Math.max(flicker, 0.2);
+    ctx.shadowColor = this.color;
+    ctx.shadowBlur = 4;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
     ctx.fillStyle = this.color;
     ctx.fill();
+    ctx.shadowBlur = 0;
     ctx.globalAlpha = 1;
   };
 
