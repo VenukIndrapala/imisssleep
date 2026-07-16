@@ -35,12 +35,12 @@ body {
 .flowers {
   position: relative;
   z-index: 3;
-  transform: scale(0.9);
+  transform: scale(0.9) translateX(var(--auto-center-shift, 0px));
 }
 
 @media (max-width: 600px) {
   .flowers {
-    transform: scale(0.72) translateX(-24vmin);
+    transform: scale(0.72) translateX(var(--auto-center-shift, 0px));
   }
 }
 
