@@ -15,7 +15,11 @@
     // Reset any previous correction so we always measure the natural,
     // un-shifted position before computing a fresh one.
     flowers.style.setProperty("--auto-center-shift", "0px");
-    // Force a reflow so the reset above is reflected before measuring.
+
+    // Freeze every element to its static end-state transform (bypassing
+    // the scale-0 "growing in" keyframes) so we measure the final resting
+    // silhouette instantly, instead of waiting for the real animation to play out.
+    document.body.classList.add("measuring");
     void flowers.offsetWidth;
 
     const scaleX = getScaleX();
@@ -30,6 +34,8 @@
       if (r.left < minLeft) minLeft = r.left;
       if (r.right > maxRight) maxRight = r.right;
     });
+
+    document.body.classList.remove("measuring");
 
     if (minLeft === Infinity) return;
 
@@ -47,10 +53,9 @@
     resizeTimer = setTimeout(centerFlowers, 300);
   });
 
-  // Wait for the bloom-in animations to settle into their resting
-  // positions before measuring, so the correction is based on the
-  // final layout rather than a mid-animation state.
-  window.addEventListener("load", () => {
-    setTimeout(centerFlowers, 7500);
-  });
+  // Measure and apply the correction immediately, before the page reveals
+  // itself (the "not-loaded" class still hides/pauses everything at this
+  // point), so the flowers are already centered on the very first visible
+  // frame and never appear to move.
+  centerFlowers();
 })();
